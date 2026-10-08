@@ -1,5 +1,7 @@
 package buffer;
 
+import worker.Consumer;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -28,17 +30,12 @@ public class BoundedBuffer {
         // TODO: fill the blanks (_____) and write this code instead of the
         // temporary code below.
         //
-        //   while (_____) {          // the box is full
-        //       _____;               // wait
-        //   }
-        //   items.addLast(item);
-        //   _____;                   // wake up the waiting threads
-
-        // TEMPORARY CODE - delete it. A full box is an error, not a wait.
-        if (items.size() >= capacity) {
-            throw new IllegalStateException("Buffer is full");
+        while(items.size() == getCapacity())     {
+            wait();
         }
-        items.addLast(item);
+          items.addLast(item);
+        notifyAll();
+
     }
 
     // ------------------------------------------------------------------
@@ -48,18 +45,14 @@ public class BoundedBuffer {
         // TODO: fill the blanks (_____) and write this code instead of the
         // temporary code below.
         //
-        //   while (_____) {          // the box is empty
-        //       _____;               // wait
-        //   }
-        //   int item = items.removeFirst();
-        //   _____;                   // wake up the waiting threads
-        //   return item;
+        while (items.isEmpty()) {
+            wait();
 
-        // TEMPORARY CODE - delete it. An empty box is an error, not a wait.
-        if (items.isEmpty()) {
-            throw new IllegalStateException("Buffer is empty");
         }
-        return items.removeFirst();
+        int item = items.removeFirst();
+        notifyAll();
+        // wake up the waiting threads
+        return item;
     }
 
     // ------------------------------------------------------------------
